@@ -36,7 +36,7 @@ class Discrete(GripperActionMode):
         self._attach_grasped_objects = attach_grasped_objects
         self._detach_before_open = detach_before_open
 
-    def _actuate(self):
+    def _actuate(self, scene, action):
         done = False
         while not done:
             done = scene.robot.gripper.actuate(action, velocity=0.2)
@@ -56,7 +56,7 @@ class Discrete(GripperActionMode):
         if current_ee != action:
             done = False
             if not self._detach_before_open:
-                self._actuate()
+                self._actuate(scene, action)
             if action == 0.0 and self._attach_grasped_objects:
                 # If gripper close action, the check for grasp.
                 for g_obj in scene.task.get_graspable_objects():
@@ -65,7 +65,7 @@ class Discrete(GripperActionMode):
                 # If gripper open action, the check for un-grasp.
                 scene.robot.gripper.release()
             if self._detach_before_open:
-                self._actuate()
+                self._actuate(scene, action)
             if action == 1.0:
                 # Step a few more times to allow objects to drop
                 for _ in range(10):
