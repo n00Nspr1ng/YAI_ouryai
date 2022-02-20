@@ -38,6 +38,8 @@ flags.DEFINE_integer('episodes_per_task', 10,
                      'The number of episodes to collect per task.')
 flags.DEFINE_integer('variations', -1,
                      'Number of variations to collect per task. -1 for all.')
+flags.DEFINE_integer('from_episode_number', 0,
+                     'The episode number of the starting episode')
 
 
 def check_and_make(dir):
@@ -268,7 +270,9 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                     # TODO: for now we do the explicit looping.
                     demo, = task_env.get_demos(
                         amount=1,
-                        live_demos=True)
+                        live_demos=True,
+                        from_episode_number=FLAGS.from_episode_number,
+                    )
                 except Exception as e:
                     attempts -= 1
                     if attempts > 0:
