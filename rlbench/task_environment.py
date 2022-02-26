@@ -85,6 +85,9 @@ class TaskEnvironment(object):
         # Returns a list of descriptions and the first observation
         return desc, self._scene.get_observation()
 
+    def get_task_descriptions(self) -> List[str]:
+        return self._scene.task.init_episode(self._variation_number)
+
     def get_observation(self) -> Observation:
         return self._scene.get_observation()
 
@@ -138,7 +141,6 @@ class TaskEnvironment(object):
             attempts = max_attempts
             while attempts > 0:
                 random_seed = np.random.get_state()
-                print(random_seed)
                 self.reset()
                 try:
                     demo = self._scene.get_demo(
