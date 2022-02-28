@@ -1,6 +1,7 @@
 import importlib
 from os.path import exists, dirname, abspath, join
 from typing import Type, List
+import pickle
 
 from pyrep import PyRep
 from pyrep.objects import VisionSensor
@@ -157,6 +158,17 @@ class Environment(object):
             amount, image_paths, self._dataset_root, variation_number,
             task_name, self._obs_config, random_selection, from_episode_number)
         return demos
+
+    def get_task_descriptions(self, task_name: str,
+                              variation_number=0) -> List[str]:
+        variation_descriptions_pkl_file = join(self._dataset_root,
+                                               f'{task_name}',
+                                               f'variation{variation_number}',
+                                               'variation_descriptions.pkl')
+        with open(variation_descriptions_pkl_file, 'rb') as f:
+            variation_descriptions = pickle.load(f)
+
+        return variation_descriptions
 
     def get_scene_data(self) -> dict:
         """Get the data of various scene/camera information.
