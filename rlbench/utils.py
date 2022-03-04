@@ -49,11 +49,22 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
         raise RuntimeError("Can't find the demos for %s at: %s" % (
             task_name, task_root))
 
-    # Sample an amount of examples for the variation of this task
-    examples_path = join(
-        task_root, VARIATIONS_FOLDER % variation_number,
-        EPISODES_FOLDER)
-    examples = listdir(examples_path)
+    if variation_number == -1:
+        variation_folders = natsorted([f for f in listdir(task_root) if 'variation' in f])
+        examples_path = task_root
+
+        examples = []
+        for vf in variation_folders:
+            variation_path = join(task_root, vf, EPISODES_FOLDER)
+            episode_paths = [f"{vf}/{EPISODES_FOLDER}/{f}" for f in listdir(variation_path)]
+            examples = examples + episode_paths
+    else:
+        # Sample an amount of examples for the variation of this task
+        examples_path = join(
+            task_root, VARIATIONS_FOLDER % variation_number,
+            EPISODES_FOLDER)
+        examples = listdir(examples_path)
+
     if amount == -1:
         amount = len(examples)
     if amount > len(examples):
@@ -72,6 +83,11 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
         example_path = join(examples_path, example)
         with open(join(example_path, LOW_DIM_PICKLE), 'rb') as f:
             obs = pickle.load(f)
+
+        if variation_number == -1:
+            obs.variation_number = int(example.split('/')[0].replace('variation', ''))
+        else:
+            obs.variation_number = variation_number
 
         l_sh_rgb_f = join(example_path, LEFT_SHOULDER_RGB_FOLDER)
         l_sh_depth_f = join(example_path, LEFT_SHOULDER_DEPTH_FOLDER)
@@ -306,6 +322,8 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                         _resize_if_needed(Image.open(
                             obs[i].front_mask),
                             obs_config.front_camera.image_size)))
+
+
 
         demos.append(obs)
     return demos

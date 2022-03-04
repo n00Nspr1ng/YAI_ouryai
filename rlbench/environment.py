@@ -164,7 +164,7 @@ class Environment(object):
         variation_descriptions_pkl_file = join(self._dataset_root,
                                                f'{task_name}',
                                                f'variation{variation_number}',
-                                               'variation_descriptions.pkl')
+                                               VARIATION_DESCRIPTIONS)
         with open(variation_descriptions_pkl_file, 'rb') as f:
             variation_descriptions = pickle.load(f)
 
