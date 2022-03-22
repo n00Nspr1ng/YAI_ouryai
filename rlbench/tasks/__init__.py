@@ -106,7 +106,9 @@ from rlbench.tasks.water_plants import WaterPlants
 from rlbench.tasks.weighing_scales import WeighingScales
 from rlbench.tasks.wipe_desk import WipeDesk
 
+# language tasks
 from rlbench.tasks.put_rubbish_in_color_bin import PutRubbishInColorBin
+from rlbench.tasks.place_wine_at_rack_location import PlaceWineAtRackLocation
 
 FS10_V1 = {
     'train': [
