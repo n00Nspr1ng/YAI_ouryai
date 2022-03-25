@@ -24,8 +24,8 @@ class PlaceWineAtRackLocation(Task):
         self.register_waypoint_ability_start(8, self._is_last)
 
     def init_episode(self, index: int) -> List[str]:
-        self.i = np.random.randint(3)
-        location = self.locations[self.i]
+        self._variation_index = index
+        location = self.locations[self._variation_index]
         self.register_success_conditions(
             [DetectedCondition(self.wine_bottle, 
                 ProximitySensor(f'success_{location}'))])
@@ -41,13 +41,13 @@ class PlaceWineAtRackLocation(Task):
         left1, left2 = Dummy('waypoint5'), Dummy('waypoint6')
         right1, right2 = Dummy('waypoint7'), Dummy('waypoint8')
         
-        if self.i == 1:
+        if self._variation_index == 1:
             next1.set_position(left1.get_position())
             next1.set_orientation(left1.get_orientation())
 
             next2.set_position(left2.get_position())
             next2.set_orientation(left2.get_orientation())
-        elif self.i == 2:
+        elif self._variation_index == 2:
             next1.set_position(right1.get_position())
             next1.set_orientation(right1.get_orientation())
 
@@ -59,7 +59,7 @@ class PlaceWineAtRackLocation(Task):
         waypoint.skip = True
 
     def variation_count(self) -> int:
-        return 1
+        return 3
 
     def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
         return [0, 0, -np.pi / 4.], [0, 0, np.pi / 4.]

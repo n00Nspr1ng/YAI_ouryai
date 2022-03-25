@@ -20,16 +20,16 @@ class PutRubbishInColorBin(Task):
         self.register_waypoint_ability_start(4, self._is_last)
 
     def init_episode(self, index: int) -> List[str]:
-        self.i = np.random.randint(2)
-        success_sensor = ProximitySensor(f'success{self.i+1}')
+        self._variation_index = index
+        success_sensor = ProximitySensor(f'success{self._variation_index+1}')
         self.register_success_conditions(
             [DetectedCondition(self.rubbish, success_sensor)])
 
-        self.main_bin = Shape(f'bin{self.i+1}')
-        self.distractor_bin = Shape(f'bin{1 if self.i+1 == 2 else 2}')
+        self.main_bin = Shape(f'bin{self._variation_index+1}')
+        self.distractor_bin = Shape(f'bin{1 if self._variation_index+1 == 2 else 2}')
 
         color_block = Shape('color_block')
-        color_name, color_rgb = self.COLORS[self.i]
+        color_name, color_rgb = self.COLORS[self._variation_index]
         color_block.set_color(color_rgb)
 
         x1, y1, z1 = color_block.get_position()
@@ -46,14 +46,13 @@ class PutRubbishInColorBin(Task):
                 'pick up the rubbish and leave it in the %s trash can' % (color_name)]
 
     def variation_count(self) -> int:
-        # TODO: The number of variations for this task.
-        return 1
+        return 2
 
     def _move_above_bin(self, _):
         w3 = Dummy('waypoint3')
         w4 = Dummy('waypoint4')
         
-        if self.i == 1:
+        if self._variation_index == 1:
             w3.set_position(w4.get_position())
             w3.set_orientation(w4.get_orientation())
 

@@ -36,13 +36,13 @@ class SlideBlockToColorTarget(Task):
     def init_episode(self, index: int) -> List[str]:
         self._variation_index = index
 
-        self.i = np.random.randint(4)
         self.register_success_conditions([
-            DetectedCondition(Shape('block'), ProximitySensor(f'success{self.i+1}'))])
+            DetectedCondition(Shape('block'), 
+                ProximitySensor(f'success{self._variation_index+1}'))])
 
 
-        target_color = self.target_colors[self.i]
-        target_waypoints = self._waypoint_paths[self.i]
+        target_color = self.target_colors[self._variation_index]
+        target_waypoints = self._waypoint_paths[self._variation_index]
 
         self._waypoints = [Dummy('waypoint%d'%(i))
                            for i in range(5)]
@@ -58,4 +58,4 @@ class SlideBlockToColorTarget(Task):
                 'cover the %s target with the block by pushing the block in its direction' % (target_color)]
 
     def variation_count(self) -> int:
-        return 1
+        return 4
