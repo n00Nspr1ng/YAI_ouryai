@@ -109,6 +109,7 @@ from rlbench.tasks.wipe_desk import WipeDesk
 # language tasks
 from rlbench.tasks.put_rubbish_in_color_bin import PutRubbishInColorBin
 from rlbench.tasks.place_wine_at_rack_location import PlaceWineAtRackLocation
+from rlbench.tasks.slide_block_to_color_target import SlideBlockToColorTarget
 
 FS10_V1 = {
     'train': [
