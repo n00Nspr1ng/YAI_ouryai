@@ -22,6 +22,7 @@ VARIATIONS_ALL_FOLDER = 'all_variations'
 
 LOW_DIM_PICKLE = 'low_dim_obs.pkl'
 VARIATION_DESCRIPTIONS = 'variation_descriptions.pkl'
+VARIATION_NUMBER = 'variation_number.pkl'
 
 TTT_FILE = 'task_design.ttt'
 

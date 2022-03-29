@@ -159,8 +159,8 @@ class Environment(object):
             task_name, self._obs_config, random_selection, from_episode_number)
         return demos
 
-    def get_task_descriptions(self, task_name: str,
-                              variation_number=0) -> List[str]:
+    def get_task_descriptions_with_variation(self, task_name: str,
+                                             variation_number=0) -> List[str]:
         variation_descriptions_pkl_file = join(self._dataset_root,
                                                f'{task_name}',
                                                f'variation{variation_number}',
@@ -169,6 +169,19 @@ class Environment(object):
             variation_descriptions = pickle.load(f)
 
         return variation_descriptions
+
+    def get_task_descriptions_with_episode(self, task_name: str,
+                                           episode_number: int) -> List[str]:
+        episode_description_pkl_file = join(self._dataset_root,
+                                            f'{task_name}',
+                                            VARIATIONS_ALL_FOLDER,
+                                            EPISODES_FOLDER,
+                                            EPISODE_FOLDER % episode_number,
+                                            VARIATION_DESCRIPTIONS)
+        with open(episode_description_pkl_file, 'rb') as f:
+            episode_description = pickle.load(f)
+
+        return episode_description
 
     def get_scene_data(self) -> dict:
         """Get the data of various scene/camera information.

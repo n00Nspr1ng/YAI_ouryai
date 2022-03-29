@@ -38,7 +38,7 @@ flags.DEFINE_integer('episodes_per_task', 10,
                      'The number of episodes to collect per task.')
 flags.DEFINE_integer('variations', -1,
                      'Number of variations to collect per task. -1 for all.')
-flags.DEFINE_bool('all_variations', False,
+flags.DEFINE_bool('all_variations', True,
                   'Include all variations when sampling epsiodes')
 
 
@@ -47,7 +47,7 @@ def check_and_make(dir):
         os.makedirs(dir)
 
 
-def save_demo(demo, example_path):
+def save_demo(demo, example_path, variation):
 
     # Save image data first, and then None the image data, and pickle
     left_shoulder_rgb_path = os.path.join(
@@ -166,6 +166,9 @@ def save_demo(demo, example_path):
     # Save the low-dimension data
     with open(os.path.join(example_path, LOW_DIM_PICKLE), 'wb') as f:
         pickle.dump(demo, f)
+
+    with open(os.path.join(example_path, VARIATION_NUMBER), 'wb') as f:
+        pickle.dump(variation, f)
 
 
 def run(i, lock, task_index, variation_count, results, file_lock, tasks):
@@ -397,7 +400,7 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
                     break
                 episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
                 with file_lock:
-                    save_demo(demo, episode_path)
+                    save_demo(demo, episode_path, variation)
 
                     with open(os.path.join(
                             episode_path, VARIATION_DESCRIPTIONS), 'wb') as f:
