@@ -50,14 +50,10 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
             task_name, task_root))
 
     if variation_number == -1:
-        variation_folders = natsorted([f for f in listdir(task_root) if 'variation' in f])
-        examples_path = task_root
-
-        examples = []
-        for vf in variation_folders:
-            variation_path = join(task_root, vf, EPISODES_FOLDER)
-            episode_paths = [f"{vf}/{EPISODES_FOLDER}/{f}" for f in listdir(variation_path)]
-            examples = examples + episode_paths
+        examples_path = join(
+            task_root, VARIATIONS_ALL_FOLDER,
+            EPISODES_FOLDER)
+        examples = listdir(examples_path)
     else:
         # Sample an amount of examples for the variation of this task
         examples_path = join(
@@ -85,7 +81,8 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
             obs = pickle.load(f)
 
         if variation_number == -1:
-            obs.variation_number = int(example.split('/')[0].replace('variation', ''))
+            with open(join(example_path, VARIATION_NUMBER), 'rb') as f:
+                obs.variation_number = pickle.load(f)
         else:
             obs.variation_number = variation_number
 
