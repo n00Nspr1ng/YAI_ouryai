@@ -41,9 +41,9 @@ class PutRubbishInColorBin(Task):
             self.main_bin.set_position([x4, y4, z4])
             self.distractor_bin.set_position([x3, y3, z3])
 
-        return ['put rubbish in %s bin' % (color_name),
-                'drop the rubbish into the %s bin' % (color_name),
-                'pick up the rubbish and leave it in the %s trash can' % (color_name)]
+        return ['put rubbish in the bin with the same color as the block',
+                'drop the rubbish into the bin with the color of the block',
+                'pick up the trash and leave it in the bin with the same color as the block']
 
     def variation_count(self) -> int:
         return 2
