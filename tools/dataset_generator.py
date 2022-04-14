@@ -369,22 +369,9 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
 
         abort_variation = False
         for ex_idx in range(FLAGS.episodes_per_task):
-            variation = np.random.randint(possible_variations)
-            task_env = rlbench_env.get_task(t)
-            task_env.set_variation(variation)
-            descriptions, obs = task_env.reset()
-
-            print('Process', i, '// Task:', task_env.get_name(),
-                  '// Variation:', variation, '// Demo:', ex_idx)
-
             attempts = 10
             while attempts > 0:
                 try:
-                    # TODO: for now we do the explicit looping.
-                    demo, = task_env.get_demos(
-                        amount=1,
-                        live_demos=True)
-                except Exception as e:
                     variation = np.random.randint(possible_variations)
                     task_env = rlbench_env.get_task(t)
                     task_env.set_variation(variation)
@@ -393,6 +380,11 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
                     print('Process', i, '// Task:', task_env.get_name(),
                           '// Variation:', variation, '// Demo:', ex_idx)
 
+                    # TODO: for now we do the explicit looping.
+                    demo, = task_env.get_demos(
+                        amount=1,
+                        live_demos=True)
+                except Exception as e:
                     attempts -= 1
                     if attempts > 0:
                         continue
