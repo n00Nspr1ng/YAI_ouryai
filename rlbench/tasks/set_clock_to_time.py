@@ -31,14 +31,14 @@ class SetClockToTime(Task):
         waypoint3.set_pose(turn_point.get_pose())
 
         return [
-            'change the clock to show time 12.15',
-            'adjust the time to 12.15',
-            'change the clock to 12.15',
-            'set the clock to 12.15',
-            'turn the knob on the back of the clock until the time shows 12.15',
-            'rotate the wheel on the clock to make it show 12.15',
-            'make the clock say 12.15',
-            'turn the knob on the back of the clock 90 degrees'
+            'change the clock to show time 12.%s' % (time),
+            'adjust the time to 12.%s' % (time),
+            'change the clock to 12.%s' % (time),
+            'set the clock to 12.%s' % (time),
+            'turn the knob on the back of the clock until the time shows 12.%s' % (time),
+            'rotate the wheel on the clock to make it show 12.%s' % (time),
+            'make the clock say 12.%s' % (time),
+            'turn the knob on the back of the clock %d degrees' % (90*(index+1))
         ]
 
     def variation_count(self) -> int:
