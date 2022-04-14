@@ -112,6 +112,7 @@ from rlbench.tasks.place_wine_at_rack_location import PlaceWineAtRackLocation
 from rlbench.tasks.slide_block_to_color_target import SlideBlockToColorTarget
 from rlbench.tasks.sweep_to_dustpan_of_size import SweepToDustpanOfSize
 from rlbench.tasks.put_books_at_shelf_location import PutBooksAtShelfLocation
+from rlbench.tasks.set_clock_to_time import SetClockToTime
 
 
 FS10_V1 = {
