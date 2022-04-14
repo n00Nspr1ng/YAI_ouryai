@@ -385,13 +385,18 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
                         amount=1,
                         live_demos=True)
                 except Exception as e:
+                    variation = np.random.randint(possible_variations)
+                    task_env = rlbench_env.get_task(t)
+                    task_env.set_variation(variation)
+                    descriptions, obs = task_env.reset()
+
                     attempts -= 1
                     if attempts > 0:
                         continue
                     problem = (
                         'Process %d failed collecting task %s (variation: %d, '
                         'example: %d). Skipping this task/variation.\n%s\n' % (
-                            i, task_env.get_name(), my_variation_count, ex_idx,
+                            i, task_env.get_name(), variation, ex_idx,
                             str(e))
                     )
                     print(problem)
