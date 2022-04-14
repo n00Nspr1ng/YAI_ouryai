@@ -390,6 +390,9 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
                     task_env.set_variation(variation)
                     descriptions, obs = task_env.reset()
 
+                    print('Process', i, '// Task:', task_env.get_name(),
+                          '// Variation:', variation, '// Demo:', ex_idx)
+
                     attempts -= 1
                     if attempts > 0:
                         continue
