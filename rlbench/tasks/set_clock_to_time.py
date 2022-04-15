@@ -22,7 +22,7 @@ class SetClockToTime(Task):
         time = TIMES[index]
 
         self.register_success_conditions([
-            DetectedCondition(Shape('clock_needle_minute'),
+            DetectedCondition(Shape('clock_minute_head'),
                               ProximitySensor('detector_%s' % time))
         ])
 
