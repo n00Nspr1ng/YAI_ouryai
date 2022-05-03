@@ -17,7 +17,7 @@ class PutItemInDrawer(Task):
                          for opt in self._options]
         self._joints = [Joint('drawer_joint_%s' % opt)
                         for opt in self._options]
-        self._waypoint1 = Dummy('waypoint1')
+        self._waypoint1 = Dummy('waypoint2')
         self._item = Shape('item')
         self.register_graspable_objects([self._item])
 
