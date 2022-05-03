@@ -158,6 +158,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         self._absolute_mode = absolute_mode
         self._frame = frame
         self._collision_checking = collision_checking
+        self._callable_each_step = None
         if frame not in ['world', 'end effector']:
             raise ValueError("Expected frame to one of: 'world, 'end effector'")
 
@@ -179,6 +180,9 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         qw, qx, qy, qz = list(new_rot)
         pose = [a_x + x, a_y + y, a_z + z] + [qx, qy, qz, qw]
         return pose
+
+    def set_callable_each_step(self, callable_each_step):
+        self._callable_each_step = callable_each_step
 
     def action(self, scene: Scene, action: np.ndarray):
         assert_action_shape(action, (7,))
@@ -228,6 +232,8 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         while not done:
             done = path.step()
             scene.step()
+            if self._callable_each_step is not None:
+                self._callable_each_step(scene.get_observation())
             success, terminate = scene.task.success()
             # If the task succeeds while traversing path, then break early
             if success:
