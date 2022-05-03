@@ -21,10 +21,17 @@ class SetClockToTime(Task):
         self._variation_index = index
         time = TIMES[index]
 
+        self.register_fail_conditions([
+            DetectedCondition(Shape('clock_needle_crank'),
+                              ProximitySensor('Panda_gripper_attachProxSensor'))
+        ])
+
         self.register_success_conditions([
             DetectedCondition(Shape('clock_minute_head'),
-                              ProximitySensor('detector_%s' % time))
+                              ProximitySensor('detector_%s' % time)),
+            NothingGrasped(self.robot.gripper)
         ])
+
 
         turn_point = self._turn_points[self._variation_index]
         waypoint3 = Dummy('waypoint2')
