@@ -42,7 +42,6 @@ class ChangeChannel(Task):
 
         btn = ['plus', 'minus']
         chnl = ['up', 'minus']
-        print('turn the channel %s' % chnl[index])
         return [
             'turn the channel %s' % chnl[index],
             'change the television channel %s' % chnl[index],
