@@ -342,9 +342,10 @@ class Task(object):
     def restore_state(self, state: Tuple[bytes, int]) -> None:
         objs = self.get_base().get_objects_in_tree(exclude_base=False)
         if len(objs) != state[1]:
-            raise RuntimeError(
-                'Expected to be resetting %d objects, but there were %d.' %
-                (state[1], len(objs)))
+            if self.name not in ['empty_container']:
+                raise RuntimeError(
+                    'Expected to be resetting %d objects, but there were %d.' %
+                    (state[1], len(objs)))
         self.pyrep.set_configuration_tree(state[0])
 
     #####################
