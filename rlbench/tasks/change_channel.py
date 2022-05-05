@@ -16,8 +16,8 @@ class ChangeChannel(Task):
         self._remote = Shape('tv_remote')
         self.register_graspable_objects([self._remote])
         self._joint_conditions = [
-            JointCondition(Joint('target_button_joint1'), 0.003),
-            JointCondition(Joint('target_button_joint2'), 0.003)
+            JointCondition(Joint('target_button_joint1'), 0.0015),
+            JointCondition(Joint('target_button_joint2'), 0.0015)
         ]
         self._remote_conditions = [
             DetectedCondition(Dummy('tv_remote_top'),
