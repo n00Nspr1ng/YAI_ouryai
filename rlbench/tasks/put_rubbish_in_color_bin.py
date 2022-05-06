@@ -28,11 +28,11 @@ class PutRubbishInColorBin(Task):
         self.main_bin = Shape(f'bin{self._variation_index+1}')
         self.distractor_bin = Shape(f'bin{1 if self._variation_index+1 == 2 else 2}')
 
-        color_block = Shape('color_block')
+        color_bulb = Shape('color_bulb')
         color_name, color_rgb = self.COLORS[self._variation_index]
-        color_block.set_color(color_rgb)
+        color_bulb.set_color(color_rgb)
 
-        x1, y1, z1 = color_block.get_position()
+        x1, y1, z1 = color_bulb.get_position()
         x2, y2, z2 = self.rubbish.get_position()
         x3, y3, z3 = self.main_bin.get_position()
         x4, y4, z4 = self.distractor_bin.get_position()
@@ -41,9 +41,9 @@ class PutRubbishInColorBin(Task):
             self.main_bin.set_position([x4, y4, z4])
             self.distractor_bin.set_position([x3, y3, z3])
 
-        return ['put rubbish in the bin with the same color as the block',
-                'drop the rubbish into the bin with the color of the block',
-                'pick up the trash and leave it in the bin with the same color as the block']
+        return ['put rubbish in the bin with the same color as the light',
+                'drop the rubbish into the bin with the color of the light',
+                'pick up the trash and leave it in the bin with the same color as the light']
 
     def variation_count(self) -> int:
         return 2
