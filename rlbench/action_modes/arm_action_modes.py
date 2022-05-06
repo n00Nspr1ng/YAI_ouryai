@@ -4,6 +4,7 @@ import numpy as np
 from pyquaternion import Quaternion
 from pyrep.const import ConfigurationPathAlgorithms as Algos
 from pyrep.errors import ConfigurationPathError, IKError
+from pyrep.const import ObjectType
 
 from rlbench.backend.exceptions import InvalidActionError
 from rlbench.backend.robot import Robot
@@ -158,6 +159,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         self._absolute_mode = absolute_mode
         self._frame = frame
         self._collision_checking = collision_checking
+        self._robot_shapes = None
         if frame not in ['world', 'end effector']:
             raise ValueError("Expected frame to one of: 'world, 'end effector'")
 
@@ -180,7 +182,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         pose = [a_x + x, a_y + y, a_z + z] + [qx, qy, qz, qw]
         return pose
 
-    def action(self, scene: Scene, action: np.ndarray):
+    def action(self, scene: Scene, action: np.ndarray, ignore_collisions: bool = True):
         assert_action_shape(action, (7,))
         assert_unit_quaternion(action[3:])
         if not self._absolute_mode and self._frame != 'end effector':
@@ -189,7 +191,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         self._quick_boundary_check(scene, action)
 
         colliding_shapes = []
-        if self._collision_checking:
+        if not ignore_collisions: # self._collision_checking:
             if self._robot_shapes is None:
                 self._robot_shapes = scene.robot.arm.get_objects_in_tree(
                     object_type=ObjectType.SHAPE)
@@ -212,7 +214,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
             path = scene.robot.arm.get_path(
                 action[:3],
                 quaternion=action[3:],
-                ignore_collisions=not self._collision_checking,
+                ignore_collisions=ignore_collisions,
                 relative_to=relative_to,
                 trials=100,
                 max_configs=10,
