@@ -30,7 +30,7 @@ class PlaceWineAtRackLocation(Task):
             [DetectedCondition(self.wine_bottle, 
                 ProximitySensor(f'success_{location}'))])
 
-        return ['stack wine bottle to the %s of the rack' % (location),
+        return ['stack the wine bottle to the %s of the rack' % (location),
                 'slide the bottle onto the %s part of the rack' % (location),
                 'put the wine on the %s' % (location),
                 'leave the wine on the %s section of the shelf' % (location),
