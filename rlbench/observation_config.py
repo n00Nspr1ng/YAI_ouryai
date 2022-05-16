@@ -13,7 +13,8 @@ class CameraConfig(object):
                  image_size=(128, 128),
                  render_mode=RenderMode.OPENGL3,
                  masks_as_one_channel=True,
-                 depth_in_meters=False):
+                 depth_in_meters=False,
+                 real_camera=False):
         self.rgb = rgb
         self.rgb_noise = rgb_noise
         self.depth = depth
@@ -24,13 +25,13 @@ class CameraConfig(object):
         self.render_mode = render_mode
         self.masks_as_one_channel = masks_as_one_channel
         self.depth_in_meters = depth_in_meters
+        self.real_camera = real_camera
 
     def set_all(self, value: bool):
         self.rgb = value
         self.depth = value
         self.point_cloud = value
         self.mask = value
-
 
 class ObservationConfig(object):
     def __init__(self,
