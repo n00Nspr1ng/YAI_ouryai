@@ -28,7 +28,7 @@ class PutItemInDrawer(Task):
         success_sensor = ProximitySensor('success_' + option)
         self.register_success_conditions(
             [DetectedCondition(self._item, success_sensor)])
-        return ['put item in %s drawer' % option,
+        return ['put the item in the %s drawer' % option,
                 'put the block away in the %s drawer' % option,
                 'open the %s drawer and place the block inside of it' % option,
                 'leave the block in the %s drawer' % option]

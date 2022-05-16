@@ -28,7 +28,8 @@ class PlaceWineAtRackLocation(Task):
         location = self.locations[self._variation_index]
         self.register_success_conditions(
             [DetectedCondition(self.wine_bottle, 
-                ProximitySensor(f'success_{location}'))])
+                ProximitySensor(f'success_{location}')),
+            NothingGrasped(self.robot.gripper)])
 
         return ['stack the wine bottle to the %s of the rack' % (location),
                 'slide the bottle onto the %s part of the rack' % (location),
