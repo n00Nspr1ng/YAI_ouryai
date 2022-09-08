@@ -349,13 +349,13 @@ def run_all_variations(i, lock, task_index, variation_count, results, file_lock,
     tasks_with_problems = results[i] = ''
 
     while True:
-        # Figure out what task/variation this thread is going to do
         # with lock:
         if task_index.value >= num_tasks:
             print('Process', i, 'finished')
             break
 
         t = tasks[task_index.value]
+
         task_env = rlbench_env.get_task(t)
         possible_variations = task_env.variation_count()
 
@@ -440,15 +440,17 @@ def main(argv):
 
     check_and_make(FLAGS.save_path)
 
-    # run_all_variations(0, lock, task_index, variation_count, result_dict, file_lock, tasks)
-    run_fn = run_all_variations if FLAGS.all_variations else run
-    processes = [Process(
-        target=run_fn, args=(
-            i, lock, task_index, variation_count, result_dict, file_lock,
-            tasks))
-        for i in range(FLAGS.processes)]
-    [t.start() for t in processes]
-    [t.join() for t in processes]
+    if FLAGS.all_variations:
+        # multiprocessing for all_variations not support (for now)
+        run_all_variations(0, lock, task_index, variation_count, result_dict, file_lock, tasks)
+    else:
+        processes = [Process(
+            target=run, args=(
+                i, lock, task_index, variation_count, result_dict, file_lock,
+                tasks))
+            for i in range(FLAGS.processes)]
+        [t.start() for t in processes]
+        [t.join() for t in processes]
 
     print('Data collection done!')
     for i in range(FLAGS.processes):
