@@ -87,6 +87,14 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
         else:
             obs.variation_number = variation_number
 
+        # language description
+        episode_descriptions_f = join(example_path, VARIATION_DESCRIPTIONS)
+        if exists(episode_descriptions_f):
+            with open(episode_descriptions_f, 'rb') as f:
+                descriptions = pickle.load(f)
+        else:
+            descriptions = ["unknown task description"]
+
         l_sh_rgb_f = join(example_path, LEFT_SHOULDER_RGB_FOLDER)
         l_sh_depth_f = join(example_path, LEFT_SHOULDER_DEPTH_FOLDER)
         l_sh_mask_f = join(example_path, LEFT_SHOULDER_MASK_FOLDER)
@@ -114,6 +122,9 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
             raise RuntimeError('Broken dataset assumption')
 
         for i in range(num_steps):
+            # descriptions
+            obs[i].misc['descriptions'] = descriptions
+
             si = IMAGE_FORMAT % i
             if obs_config.left_shoulder_camera.rgb:
                 obs[i].left_shoulder_rgb = join(l_sh_rgb_f, si)
