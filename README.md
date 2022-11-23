@@ -78,7 +78,7 @@ Now lets install RLBench:
 
 ```bash
 pip install -r requirements.txt
-pip install .
+python setup.py develop
 ```
 
 And that's it!
