@@ -290,7 +290,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                     break
                 episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
                 with file_lock:
-                    save_demo(demo, episode_path)
+                    save_demo(demo, episode_path, my_variation_count)
                 break
             if abort_variation:
                 break
