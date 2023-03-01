@@ -246,19 +246,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                 break
             t = tasks[task_index.value]
 
-        task_env = rlbench_env.get_task(t)
-        task_env.set_variation(my_variation_count)
-        descriptions, obs = task_env.reset()
-
         variation_path = os.path.join(
             FLAGS.save_path, task_env.get_name(),
             VARIATIONS_FOLDER % my_variation_count)
-
         check_and_make(variation_path)
-
-        with open(os.path.join(
-                variation_path, VARIATION_DESCRIPTIONS), 'wb') as f:
-            pickle.dump(descriptions, f)
 
         episodes_path = os.path.join(variation_path, EPISODES_FOLDER)
         check_and_make(episodes_path)
@@ -270,6 +261,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
             attempts = 10
             while attempts > 0:
                 try:
+                    task_env = rlbench_env.get_task(t)
+                    task_env.set_variation(my_variation_count)
+                    descriptions, obs = task_env.reset()
+
                     # TODO: for now we do the explicit looping.
                     demo, = task_env.get_demos(
                         amount=1,
@@ -291,6 +286,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                 episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
                 with file_lock:
                     save_demo(demo, episode_path, my_variation_count)
+
+                    with open(os.path.join(
+                            episode_path, VARIATION_DESCRIPTIONS), 'wb') as f:
+                        pickle.dump(descriptions, f)
                 break
             if abort_variation:
                 break
