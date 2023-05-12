@@ -62,6 +62,9 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
             EPISODES_FOLDER)
         examples = listdir(examples_path)
 
+    # hack: ignore .DS_Store files from macOS zips
+    examples = [e for e in examples if '.DS_Store' not in e]
+
     if amount == -1:
         amount = len(examples)
     if amount > len(examples):
