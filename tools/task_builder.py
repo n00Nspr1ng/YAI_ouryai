@@ -27,6 +27,8 @@ import shutil
 
 CURRENT_DIR = dirname(abspath(__file__))
 
+# import numpy as np 
+# np.random.seed(3)
 
 def print_fail(message, end='\n'):
     message = str(message)

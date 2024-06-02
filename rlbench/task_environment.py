@@ -17,7 +17,7 @@ from rlbench.observation_config import ObservationConfig
 
 _DT = 0.05
 _MAX_RESET_ATTEMPTS = 40
-_MAX_DEMO_ATTEMPTS = 10
+_MAX_DEMO_ATTEMPTS = 30
 
 
 class TaskEnvironment(object):
@@ -113,7 +113,8 @@ class TaskEnvironment(object):
                   callable_each_step: Callable[[Observation], None] = None,
                   max_attempts: int = _MAX_DEMO_ATTEMPTS,
                   random_selection: bool = True,
-                  from_episode_number: int = 0
+                  from_episode_number: int = 0,
+                  seed_index = None # MODIFIED
                   ) -> List[Demo]:
         """Negative means all demos"""
 
@@ -134,29 +135,49 @@ class TaskEnvironment(object):
             ctr_loop = self._robot.arm.joints[0].is_control_loop_enabled()
             self._robot.arm.set_control_loop_enabled(True)
             demos = self._get_live_demos(
-                amount, callable_each_step, max_attempts)
+                amount, callable_each_step, max_attempts, seed_index)
             self._robot.arm.set_control_loop_enabled(ctr_loop)
         return demos
 
     def _get_live_demos(self, amount: int,
                         callable_each_step: Callable[
                             [Observation], None] = None,
-                        max_attempts: int = _MAX_DEMO_ATTEMPTS) -> List[Demo]:
+                        max_attempts: int = _MAX_DEMO_ATTEMPTS, 
+                        seed_index = None) -> List[Demo]:
         demos = []
         for i in range(amount):
             attempts = max_attempts
             while attempts > 0:
-                random_seed = np.random.get_state()
-                self.reset()
+                if not seed_index: # MODIFIED
+                    random_seed = np.random.get_state()
+                else:
+                    np.random.seed(seed_index.value)
+                    random_seed = seed_index.value # MODIFIED
+
+                ### MODIFIED
+                while True: 
+                    try: 
+                        self.reset()
+                        break
+                    except Exception as e:
+                        seed_index.value += 1   # MODIFIED
+                        np.random.seed(seed_index.value)
+                        random_seed = seed_index.value # MODIFIED
+                ### 
+
                 try:
                     demo = self._scene.get_demo(
                         callable_each_step=callable_each_step)
                     demo.random_seed = random_seed
                     demos.append(demo)
+                    print("Seed", seed_index.value, "Success")
+                    seed_index.value += 1   # MODIFIED
                     break
                 except Exception as e:
                     attempts -= 1
-                    logging.info('Bad demo. ' + str(e))
+                    # logging.info('Bad demo. ' + str(e))
+                    print("Seed", random_seed, "Fail")
+                    seed_index.value += 1   # MODIFIED
             if attempts <= 0:
                 raise RuntimeError(
                     'Could not collect demos. Maybe a problem with the task?')
