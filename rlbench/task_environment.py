@@ -89,6 +89,9 @@ class TaskEnvironment(object):
         # Returns a list of descriptions and the first observation
         return desc, self._scene.get_observation()
 
+    def get_task_descriptions(self) -> List[str]:
+        return self._scene.task.init_episode(self._variation_number)
+
     def get_observation(self) -> Observation:
         return self._scene.get_observation()
 
@@ -175,9 +178,13 @@ class TaskEnvironment(object):
                     break
                 except Exception as e:
                     attempts -= 1
+<<<<<<< HEAD
                     # logging.info('Bad demo. ' + str(e))
                     print("Seed", random_seed, "Fail")
                     seed_index.value += 1   # MODIFIED
+=======
+                    logging.info('Bad demo. ' + str(e) + ' Attempts left: ' + str(attempts))
+>>>>>>> 1690e9321fd9f1e9a5680127ad53c01ed028db40
             if attempts <= 0:
                 raise RuntimeError(
                     'Could not collect demos. Maybe a problem with the task?')

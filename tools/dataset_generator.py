@@ -38,6 +38,8 @@ flags.DEFINE_integer('episodes_per_task', 10,
                      'The number of episodes to collect per task.')
 flags.DEFINE_integer('variations', -1,
                      'Number of variations to collect per task. -1 for all.')
+flags.DEFINE_bool('all_variations', True,
+                  'Include all variations when sampling epsiodes')
 
 
 def check_and_make(dir):
@@ -45,7 +47,7 @@ def check_and_make(dir):
         os.makedirs(dir)
 
 
-def save_demo(demo, example_path):
+def save_demo(demo, example_path, variation):
 
     # Save image data first, and then None the image data, and pickle
     left_shoulder_rgb_path = os.path.join(
@@ -165,6 +167,9 @@ def save_demo(demo, example_path):
     with open(os.path.join(example_path, LOW_DIM_PICKLE), 'wb') as f:
         pickle.dump(demo, f)
 
+    with open(os.path.join(example_path, VARIATION_NUMBER), 'wb') as f:
+        pickle.dump(variation, f)
+
 
 def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     """Each thread will choose one task and variation, and then gather
@@ -247,19 +252,17 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                 break
             t = tasks[task_index.value]
 
+<<<<<<< HEAD
         task_env = rlbench_env.get_task(t)
         task_env.set_variation(my_variation_count)
         descriptions, _ = task_env.reset()
 
+=======
+>>>>>>> 1690e9321fd9f1e9a5680127ad53c01ed028db40
         variation_path = os.path.join(
             FLAGS.save_path, task_env.get_name(),
             VARIATIONS_FOLDER % my_variation_count)
-
         check_and_make(variation_path)
-
-        with open(os.path.join(
-                variation_path, VARIATION_DESCRIPTIONS), 'wb') as f:
-            pickle.dump(descriptions, f)
 
         episodes_path = os.path.join(variation_path, EPISODES_FOLDER)
         check_and_make(episodes_path)
@@ -271,6 +274,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
             attempts = 10
             while attempts > 0:
                 try:
+                    task_env = rlbench_env.get_task(t)
+                    task_env.set_variation(my_variation_count)
+                    descriptions, obs = task_env.reset()
+
                     # TODO: for now we do the explicit looping.
                     demo, = task_env.get_demos(
                         amount=1,
@@ -291,10 +298,131 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                     break
                 episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
                 with file_lock:
-                    save_demo(demo, episode_path)
+                    save_demo(demo, episode_path, my_variation_count)
+
+                    with open(os.path.join(
+                            episode_path, VARIATION_DESCRIPTIONS), 'wb') as f:
+                        pickle.dump(descriptions, f)
                 break
             if abort_variation:
                 break
+
+    results[i] = tasks_with_problems
+    rlbench_env.shutdown()
+
+
+def run_all_variations(i, lock, task_index, variation_count, results, file_lock, tasks):
+    """Each thread will choose one task and variation, and then gather
+    all the episodes_per_task for that variation."""
+
+    # Initialise each thread with random seed
+    np.random.seed(None)
+    num_tasks = len(tasks)
+
+    img_size = list(map(int, FLAGS.image_size))
+
+    obs_config = ObservationConfig()
+    obs_config.set_all(True)
+    obs_config.right_shoulder_camera.image_size = img_size
+    obs_config.left_shoulder_camera.image_size = img_size
+    obs_config.overhead_camera.image_size = img_size
+    obs_config.wrist_camera.image_size = img_size
+    obs_config.front_camera.image_size = img_size
+
+    # Store depth as 0 - 1
+    obs_config.right_shoulder_camera.depth_in_meters = False
+    obs_config.left_shoulder_camera.depth_in_meters = False
+    obs_config.overhead_camera.depth_in_meters = False
+    obs_config.wrist_camera.depth_in_meters = False
+    obs_config.front_camera.depth_in_meters = False
+
+    # We want to save the masks as rgb encodings.
+    obs_config.left_shoulder_camera.masks_as_one_channel = False
+    obs_config.right_shoulder_camera.masks_as_one_channel = False
+    obs_config.overhead_camera.masks_as_one_channel = False
+    obs_config.wrist_camera.masks_as_one_channel = False
+    obs_config.front_camera.masks_as_one_channel = False
+
+    if FLAGS.renderer == 'opengl':
+        obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.overhead_camera.render_mode = RenderMode.OPENGL
+        obs_config.wrist_camera.render_mode = RenderMode.OPENGL
+        obs_config.front_camera.render_mode = RenderMode.OPENGL
+
+    rlbench_env = Environment(
+        action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
+        obs_config=obs_config,
+        headless=True)
+    rlbench_env.launch()
+
+    task_env = None
+
+    tasks_with_problems = results[i] = ''
+
+    while True:
+        # with lock:
+        if task_index.value >= num_tasks:
+            print('Process', i, 'finished')
+            break
+
+        t = tasks[task_index.value]
+
+        task_env = rlbench_env.get_task(t)
+        possible_variations = task_env.variation_count()
+
+        variation_path = os.path.join(
+            FLAGS.save_path, task_env.get_name(),
+            VARIATIONS_ALL_FOLDER)
+        check_and_make(variation_path)
+
+        episodes_path = os.path.join(variation_path, EPISODES_FOLDER)
+        check_and_make(episodes_path)
+
+        abort_variation = False
+        for ex_idx in range(FLAGS.episodes_per_task):
+            attempts = 10
+            while attempts > 0:
+                try:
+                    variation = np.random.randint(possible_variations)
+                    task_env = rlbench_env.get_task(t)
+                    task_env.set_variation(variation)
+                    descriptions, obs = task_env.reset()
+
+                    print('Process', i, '// Task:', task_env.get_name(),
+                          '// Variation:', variation, '// Demo:', ex_idx)
+
+                    # TODO: for now we do the explicit looping.
+                    demo, = task_env.get_demos(
+                        amount=1,
+                        live_demos=True)
+                except Exception as e:
+                    attempts -= 1
+                    if attempts > 0:
+                        continue
+                    problem = (
+                        'Process %d failed collecting task %s (variation: %d, '
+                        'example: %d). Skipping this task/variation.\n%s\n' % (
+                            i, task_env.get_name(), variation, ex_idx,
+                            str(e))
+                    )
+                    print(problem)
+                    tasks_with_problems += problem
+                    abort_variation = True
+                    break
+                episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
+                with file_lock:
+                    save_demo(demo, episode_path, variation)
+
+                    with open(os.path.join(
+                            episode_path, VARIATION_DESCRIPTIONS), 'wb') as f:
+                        pickle.dump(descriptions, f)
+                break
+            if abort_variation:
+                break
+
+        # with lock:
+        task_index.value += 1
 
     results[i] = tasks_with_problems
     rlbench_env.shutdown()
@@ -324,13 +452,17 @@ def main(argv):
 
     check_and_make(FLAGS.save_path)
 
-    processes = [Process(
-        target=run, args=(
-            i, lock, task_index, variation_count, result_dict, file_lock,
-            tasks))
-        for i in range(FLAGS.processes)]
-    [t.start() for t in processes]
-    [t.join() for t in processes]
+    if FLAGS.all_variations:
+        # multiprocessing for all_variations not support (for now)
+        run_all_variations(0, lock, task_index, variation_count, result_dict, file_lock, tasks)
+    else:
+        processes = [Process(
+            target=run, args=(
+                i, lock, task_index, variation_count, result_dict, file_lock,
+                tasks))
+            for i in range(FLAGS.processes)]
+        [t.start() for t in processes]
+        [t.join() for t in processes]
 
     print('Data collection done!')
     for i in range(FLAGS.processes):

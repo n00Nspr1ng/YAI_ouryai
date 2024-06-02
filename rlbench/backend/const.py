@@ -18,9 +18,11 @@ FRONT_MASK_FOLDER = 'front_mask'
 EPISODES_FOLDER = 'episodes'
 EPISODE_FOLDER = 'episode%d'
 VARIATIONS_FOLDER = 'variation%d'
+VARIATIONS_ALL_FOLDER = 'all_variations'
 
 LOW_DIM_PICKLE = 'low_dim_obs.pkl'
 VARIATION_DESCRIPTIONS = 'variation_descriptions.pkl'
+VARIATION_NUMBER = 'variation_number.pkl'
 
 TTT_FILE = 'task_design.ttt'
 
